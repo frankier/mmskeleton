@@ -12,7 +12,8 @@ class ST_GCN_18(nn.Module):
     Args:
         in_channels (int): Number of channels in the input data
         num_class (int): Number of classes for the classification task
-        graph_cfg (dict): The arguments for building the graph
+        graph_cfg (dict|Graph): The arguments for building the graph
+            or an instance compatible with `mmskeleton.ops.st_gcn.graph.Graph`
         edge_importance_weighting (bool): If ``True``, adds a learnable
             importance weighting to the edges of the graph
         **kwargs (optional): Other parameters for graph convolution units
@@ -35,7 +36,10 @@ class ST_GCN_18(nn.Module):
         super().__init__()
 
         # load graph
-        self.graph = Graph(**graph_cfg)
+        if isinstance(graph_cfg, dict):
+            self.graph = Graph(**graph_cfg)
+        else:
+            self.graph = graph_cfg
         A = torch.tensor(self.graph.A,
                          dtype=torch.float32,
                          requires_grad=False)
